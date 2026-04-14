@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project LINIS — Spotless Spot</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil:   #2C1A0E;
+    --bark:   #4A2E1A;
+    --moss:   #3D5A2A;
+    --fern:   #5A7A3A;
+    --leaf:   #7DAF4A;
+    --sprout: #A8CC6A;
+    --sun:    #D4A847;
+    --cream:  #F5EDD8;
+    --parch:  #EDE0C4;
+    --fog:    #C8B89A;
+    --stone:  #8A7A6A;
+    --gold:   #C8943A;
+    --copper: #A0622A;
+    --rust:   #7A3A1A;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Crimson Pro',Georgia,serif;
+    background:var(--cream);
+    color:var(--soil);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(ellipse 120% 80% at 15% 0%, rgba(168,204,106,0.13) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 60% at 90% 100%, rgba(93,122,58,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(212,168,71,0.05) 0%, transparent 70%);
+  }
+  .wrap { position:relative; z-index:1; }
+
+  /* NAV */
+  nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 48px; height:68px;
+    background:var(--moss);
+    position:sticky; top:0; z-index:100;
+    box-shadow:0 3px 20px rgba(44,26,14,0.35);
+    border-bottom:3px solid var(--fern);
+  }
+  .logo {
+    font-family:'Playfair Display',serif; font-weight:900; font-size:1.35rem;
+    color:var(--cream); letter-spacing:0.05em;
+    display:flex; align-items:center; gap:12px;
+    text-shadow:0 1px 4px rgba(0,0,0,0.25);
+  }
+  .logo-leaf { font-size:1.5rem; display:inline-block; animation:sway 4s ease-in-out infinite; transform-origin:bottom center; }
+  @keyframes sway { 0%,100%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)} }
+  .nav-tabs {
+    display:flex; gap:0;
+    background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);
+    border-radius:9px; padding:4px;
+  }
+  .tab-btn {
+    font-family:'Crimson Pro',serif; font-size:1rem; font-weight:500;
+    padding:7px 22px; border:none; border-radius:6px;
+    cursor:pointer; transition:all 0.25s;
+    background:transparent; color:rgba(245,237,216,0.65); letter-spacing:0.02em;
+  }
+  .tab-btn.active { background:var(--cream); color:var(--moss); font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+  .live-badge { font-family:'Crimson Pro',serif; font-size:0.88rem; color:var(--sprout); display:flex; align-items:center; gap:7px; font-style:italic; }
+  .live-dot { width:7px; height:7px; background:var(--sprout); border-radius:50%; box-shadow:0 0 8px var(--sprout); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+  /* PAGES */
+  .page { display:none; padding:48px; max-width:1080px; margin:0 auto; }
+  .page.active { display:block; }
+
+  /* HERO */
+  .hero { text-align:center; padding:64px 0 44px; position:relative; }
+  .hero::before { content:'🌿'; position:absolute; top:32px; left:4%; font-size:3rem; opacity:0.12; transform:rotate(-20deg); }
+  .hero::after  { content:'🍃'; position:absolute; top:44px; right:4%; font-size:2.5rem; opacity:0.12; transform:rotate(15deg); }
+  .hero-eyebrow {
+    display:inline-block; font-family:'Crimson Pro',serif; font-style:italic;
+    font-size:1.05rem; color:var(--fern); letter-spacing:0.06em;
+    border-bottom:1px solid var(--fern); padding-bottom:4px; margin-bottom:18px;
+  }
+  .hero h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(2.8rem,6vw,5rem);
+    font-weight:900; line-height:1.02; letter-spacing:-0.01em; color:var(--soil); margin-bottom:16px;
+  }
+  .hero h1 em { color:var(--moss); font-style:italic; }
+  .hero p { font-size:1.15rem; color:var(--stone); max-width:460px; margin:0 auto; line-height:1.7; font-weight:300; }
+
+  /* DIVIDER */
+  .divider { display:flex; align-items:center; gap:16px; margin:6px 0 32px; color:var(--fog); }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--fog),transparent); }
+  .divider span { font-size:1.1rem; }
+
+  /* STATUS */
+  .status-bar { background:var(--parch); border:1px solid var(--fog); border-radius:8px; padding:10px 18px; margin-bottom:28px; font-size:0.95rem; color:var(--stone); font-style:italic; }
+  .status-bar.ok  { border-color:var(--fern); color:var(--moss); background:rgba(93,122,58,0.07); }
+  .status-bar.err { border-color:var(--copper); color:var(--rust); background:rgba(160,98,42,0.07); }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:16px; margin-bottom:40px; }
+  .stat-card {
+    background:var(--parch); border:1px solid var(--fog); border-radius:13px;
+    padding:20px 16px; text-align:center; position:relative; overflow:hidden;
+    transition:transform 0.2s,box-shadow 0.2s;
+  }
+  .stat-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(44,26,14,0.1); }
+  .stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--fern),var(--leaf),var(--sprout)); }
+  .stat-num { font-family:'Playfair Display',serif; font-size:2.1rem; font-weight:700; color:var(--moss); line-height:1; margin-bottom:5px; }
+  .stat-label { font-size:0.7rem; color:var(--stone); font-weight:500; letter-spacing:0.09em; text-transform:uppercase; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700;
+    color:var(--bark); margin-bottom:18px; display:flex; align-items:center; gap:12px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--fog),transparent); }
+
+  /* GRADE CARDS */
+  .grade-boards { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; margin-bottom:40px; }
+  .grade-card {
+    background:var(--parch); border:1px solid var(--fog); border-radius:13px;
+    padding:20px; position:relative; overflow:hidden;
+    transition:transform 0.2s,box-shadow 0.2s;
+  }
+  .grade-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(44,26,14,0.1); }
+  .grade-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--moss),var(--leaf)); }
+  .grade-card.top { border-color:var(--sun); }
+  .grade-card.top::before { background:linear-gradient(90deg,var(--gold),var(--sun)); }
+  .grade-card.top::after { content:'🌟'; position:absolute; top:12px; right:14px; font-size:1rem; }
+  .gc-label { font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--stone); margin-bottom:4px; }
+  .gc-name  { font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem; color:var(--bark); margin-bottom:8px; }
+  .gc-pts   { font-family:'Playfair Display',serif; font-weight:700; font-size:1.7rem; color:var(--moss); line-height:1; }
+  .gc-pts small { font-size:0.7rem; color:var(--stone); font-weight:400; font-family:'Crimson Pro',serif; }
+  .gc-sub   { font-size:0.82rem; color:var(--stone); margin-top:4px; font-style:italic; }
+  .bar-track { margin-top:12px; height:5px; background:rgba(44,26,14,0.08); border-radius:3px; overflow:hidden; }
+  .bar-fill  { height:100%; background:linear-gradient(90deg,var(--moss),var(--sprout)); border-radius:3px; transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+
+  /* LEADERBOARD */
+  .lb-table { width:100%; border-collapse:separate; border-spacing:0 8px; }
+  .lb-table thead th {
+    font-family:'Crimson Pro',serif; font-size:0.72rem; font-weight:500;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--stone);
+    padding:0 18px 6px; text-align:left;
+  }
+  .lb-table thead th:last-child { text-align:right; }
+  .lb-row { background:var(--parch); transition:transform 0.15s,box-shadow 0.15s; }
+  .lb-row:hover { transform:translateX(4px); box-shadow:0 3px 14px rgba(44,26,14,0.1); }
+  .lb-row td { padding:14px 18px; font-size:0.98rem; border-top:1px solid var(--fog); border-bottom:1px solid var(--fog); }
+  .lb-row td:first-child { border-left:1px solid var(--fog); border-radius:10px 0 0 10px; width:54px; }
+  .lb-row td:last-child  { border-right:1px solid var(--fog); border-radius:0 10px 10px 0; text-align:right; }
+  .lb-row.r1 td { border-color:var(--sun); background:rgba(212,168,71,0.08); }
+  .lb-row.r2 td { background:rgba(138,122,106,0.05); }
+  .lb-row.r3 td { border-color:var(--copper); background:rgba(160,98,42,0.05); }
+  .rank-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:0.82rem; }
+  .r1 .rank-badge { background:var(--sun); color:var(--soil); }
+  .r2 .rank-badge { background:var(--fog); color:var(--bark); }
+  .r3 .rank-badge { background:var(--copper); color:var(--cream); }
+  .rN .rank-badge { background:rgba(44,26,14,0.08); color:var(--stone); }
+  .s-name { font-weight:500; color:var(--bark); }
+  .s-id   { font-size:0.78rem; color:var(--stone); margin-top:2px; font-family:monospace; }
+  .grade-chip { display:inline-block; padding:3px 12px; background:rgba(93,122,58,0.1); border:1px solid rgba(93,122,58,0.3); color:var(--moss); border-radius:100px; font-size:0.78rem; font-weight:500; font-style:italic; }
+  .pts { font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem; color:var(--moss); }
+  .pts span { font-size:0.68rem; font-weight:400; color:var(--stone); font-family:'Crimson Pro',serif; }
+  .msg-row td { padding:28px; color:var(--stone); font-size:1rem; text-align:center; font-style:italic; }
+
+  /* SETUP */
+  .setup-card { background:rgba(212,168,71,0.08); border:1px solid var(--sun); border-radius:14px; padding:28px 32px; margin:32px 0; }
+  .setup-card h2 { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--gold); margin-bottom:10px; }
+  .setup-card p  { color:var(--stone); font-size:0.95rem; line-height:1.7; margin-bottom:16px; font-style:italic; }
+  .url-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .url-input { flex:1; min-width:260px; background:var(--cream); border:1.5px solid var(--fog); border-radius:8px; padding:11px 14px; color:var(--soil); font-family:'Crimson Pro',serif; font-size:1rem; }
+  .url-input:focus { outline:none; border-color:var(--moss); }
+  .save-btn { background:var(--moss); color:var(--cream); font-family:'Playfair Display',serif; font-weight:700; font-size:0.95rem; padding:11px 22px; border:none; border-radius:8px; cursor:pointer; }
+  .save-btn:hover { background:var(--fern); }
+
+  /* POINT CHECKER */
+  .checker-hero { text-align:center; padding:56px 0 36px; position:relative; }
+  .checker-hero::before { content:'🌱'; position:absolute; top:28px; left:7%; font-size:2.5rem; opacity:0.12; transform:rotate(-10deg); }
+  .hero-eyebrow-sm { display:inline-block; font-family:'Crimson Pro',serif; font-style:italic; font-size:1rem; color:var(--fern); border-bottom:1px solid var(--fern); padding-bottom:3px; margin-bottom:14px; letter-spacing:0.06em; }
+  .checker-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,5vw,3.8rem); font-weight:900; letter-spacing:-0.01em; line-height:1.05; margin-bottom:10px; color:var(--soil); }
+  .checker-hero h1 em { color:var(--moss); font-style:italic; }
+  .checker-hero p { color:var(--stone); font-size:1.1rem; line-height:1.6; font-style:italic; }
+  .checker-wrap { max-width:520px; margin:0 auto; }
+  .checker-card {
+    background:var(--parch); border:1px solid var(--fog); border-radius:16px;
+    padding:32px; margin-bottom:18px;
+    box-shadow:0 4px 20px rgba(44,26,14,0.07);
+    position:relative; overflow:hidden;
+  }
+  .checker-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--moss),var(--leaf),var(--sprout)); }
+  .checker-card h2 { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; color:var(--bark); margin-bottom:6px; }
+  .checker-card p  { color:var(--stone); font-size:0.95rem; margin-bottom:22px; line-height:1.6; font-style:italic; }
+  .input-label { font-size:0.7rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--stone); margin-bottom:7px; display:block; }
+  .id-input {
+    width:100%; background:var(--cream); border:1.5px solid var(--fog);
+    border-radius:10px; padding:13px 16px; color:var(--soil);
+    font-family:'Crimson Pro',serif; font-size:1.1rem; letter-spacing:0.04em;
+    transition:border-color 0.2s,box-shadow 0.2s; margin-bottom:14px;
+  }
+  .id-input:focus { outline:none; border-color:var(--moss); box-shadow:0 0 0 3px rgba(93,122,58,0.1); }
+  .id-input::placeholder { color:var(--fog); font-style:italic; }
+  .check-btn {
+    width:100%; background:var(--moss); color:var(--cream);
+    font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem;
+    padding:14px; border:none; border-radius:10px; cursor:pointer;
+    transition:all 0.2s; letter-spacing:0.03em;
+    box-shadow:0 4px 14px rgba(61,90,42,0.3);
+  }
+  .check-btn:hover { background:var(--fern); transform:translateY(-1px); box-shadow:0 6px 18px rgba(61,90,42,0.35); }
+  .result-card {
+    background:var(--parch); border:1px solid var(--fog); border-radius:16px;
+    padding:28px; display:none; animation:fadeUp 0.35s ease;
+    box-shadow:0 4px 20px rgba(44,26,14,0.06);
+  }
+  .result-card.show { display:block; }
+  .result-card.err  { border-color:var(--copper); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .r-name { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; color:var(--bark); margin-bottom:4px; }
+  .r-meta { color:var(--stone); font-size:0.88rem; margin-bottom:22px; font-style:italic; }
+  .r-pts-block { display:flex; align-items:center; gap:18px; padding:18px 20px; background:rgba(93,122,58,0.08); border:1px solid rgba(93,122,58,0.2); border-radius:12px; margin-bottom:18px; }
+  .r-icon { font-size:2.2rem; }
+  .r-pts { font-family:'Playfair Display',serif; font-size:3rem; font-weight:900; color:var(--moss); line-height:1; }
+  .r-pts.err { color:var(--rust); }
+  .r-pts-label { font-size:0.7rem; color:var(--stone); margin-top:3px; letter-spacing:0.08em; text-transform:uppercase; }
+  .r-rank-row { display:flex; justify-content:space-between; align-items:center; font-size:0.92rem; color:var(--stone); font-style:italic; }
+  .r-rank-val { font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem; color:var(--bark); font-style:normal; }
+
+  /* FOOTER */
+  footer {
+    text-align:center; padding:28px 40px;
+    background:var(--moss); color:rgba(245,237,216,0.6);
+    font-size:0.88rem; font-style:italic; margin-top:60px;
+    border-top:3px solid var(--fern);
+  }
+  footer strong { color:var(--sprout); font-style:normal; }
+
+  @media(max-width:640px) {
+    nav { padding:0 18px; }
+    .page { padding:20px 16px; }
+    .live-badge { display:none; }
+    .hero h1 { font-size:2.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+  <div class="logo">
+    <span class="logo-leaf">🌿</span>
+    PROJECT LINIS
+  </div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showPage('leaderboard',this)">🏆 Leaderboard</button>
+    <button class="tab-btn" onclick="showPage('points',this)">🔍 My Points</button>
+  </div>
+  <div class="live-badge">
+    <span class="live-dot"></span>
+    Live · 60s refresh
+  </div>
+</nav>
+
+<!-- LEADERBOARD -->
+<div class="page active" id="page-leaderboard">
+  <div class="hero">
+    <div class="hero-eyebrow">♻️ Spotless Spot Competition</div>
+    <h1>Clean campus,<br><em>cleaner future.</em></h1>
+    <p>Pick up litter, scan the QR code, earn points for your batch — and help keep PSHS spotless.</p>
+  </div>
+  <div class="divider"><span>🍂</span></div>
+
+  <div class="setup-card" id="setup-card" style="display:none">
+    <h2>⚙️ Setup Required</h2>
+    <p>Paste your Google Apps Script Web App URL to connect the leaderboard.</p>
+    <div class="url-row">
+      <input type="text" class="url-input" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" />
+      <button class="save-btn" onclick="saveUrl()">Connect →</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status-bar">🌱 Loading data from the field...</div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="s-scans">–</div><div class="stat-label">Valid Scans</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-students">–</div><div class="stat-label">Participants</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-top">–</div><div class="stat-label">Top Score</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-time">–</div><div class="stat-label">Last Updated</div></div>
+  </div>
+
+  <div class="section-title">🌾 Grade Level Standings</div>
+  <div class="grade-boards" id="grade-boards">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--stone);font-style:italic">Gathering data from the field...</div>
+  </div>
+
+  <div class="section-title">🏅 Individual Rankings</div>
+  <table class="lb-table">
+    <thead><tr><th>#</th><th>Student</th><th>Grade</th><th>Points</th></tr></thead>
+    <tbody id="lb-body"><tr class="msg-row"><td colspan="4">Gathering data from the field...</td></tr></tbody>
+  </table>
+</div>
+
+<!-- MY POINTS -->
+<div class="page" id="page-points">
+  <div class="checker-hero">
+    <div class="hero-eyebrow-sm">🔍 Point Checker</div>
+    <h1>See how you've<br><em>grown.</em></h1>
+    <p>Enter your Student ID to see your total points and school ranking.</p>
+  </div>
+  <div class="checker-wrap">
+    <div class="checker-card">
+      <h2>Look up your points</h2>
+      <p>Enter your Student ID exactly as registered — e.g., <strong style="font-style:normal;color:var(--bark)">01-2023-052</strong></p>
+      <label class="input-label">Your Student ID</label>
+      <input type="text" class="id-input" id="sid-input" placeholder="e.g. 01-2023-052" />
+      <button class="check-btn" onclick="checkPoints()">Check My Points →</button>
+    </div>
+    <div class="result-card" id="result-card">
+      <div class="r-name" id="r-name">–</div>
+      <div class="r-meta" id="r-meta">–</div>
+      <div class="r-pts-block">
+        <div class="r-icon">🌿</div>
+        <div>
+          <div class="r-pts" id="r-pts">0</div>
+          <div class="r-pts-label">Points Earned</div>
+        </div>
+      </div>
+      <div class="r-rank-row">
+        <span>School Rank</span>
+        <span class="r-rank-val" id="r-rank">–</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<footer>
+  <strong>Project LINIS</strong> · PSHS Main Campus · Making cleanliness rewarding, one scan at a time 🌱
+</footer>
+
+<script>
+var API_URL  = localStorage.getItem('linis_api') || 'https://script.google.com/macros/s/AKfycbzmg28KKFn9K1QxsEPNjpTsSW6q9ggK1wt0m9tm80eLBl1rMTTUYl_ecPB9dJw19GOf/exec';
+var students = {};
+
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('setup-card').style.display = 'none';
+  fetchData();
+  document.getElementById('sid-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPoints();
+  });
+  setInterval(fetchData, 60000);
+});
+
+function saveUrl() {
+  var val = document.getElementById('api-url-input').value.trim();
+  if (!val.startsWith('https://script.google.com')) { alert('Please paste a valid Apps Script URL.'); return; }
+  API_URL = val;
+  localStorage.setItem('linis_api', API_URL);
+  document.getElementById('setup-card').style.display = 'none';
+  fetchData();
+}
+
+function fetchData() {
+  if (!API_URL) return;
+  var cbName = '__linis_' + Date.now();
+  var old = document.getElementById('__linis_script');
+  if (old) old.remove();
+  window[cbName] = function(d) {
+    delete window[cbName];
+    if (d.error) { setStatus('err', '⚠️ ' + d.error); return; }
+    students = d.students || {};
+    render();
+    setStatus('ok', '✅ Live data · Updated ' + new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'}));
+  };
+  var s = document.createElement('script');
+  s.id = '__linis_script';
+  s.src = API_URL + '?callback=' + cbName;
+  s.onerror = function() {
+    setStatus('err', '⚠️ Could not reach the Apps Script. Make sure it is deployed as "Anyone" can access.');
+    delete window[cbName];
+  };
+  document.head.appendChild(s);
+}
+
+function render() {
+  var list  = Object.values(students);
+  var total = list.reduce(function(s,x){return s+x.points;},0);
+  var top   = list.length ? Math.max.apply(null,list.map(function(x){return x.points;})) : 0;
+  $('s-scans',total); $('s-students',list.length); $('s-top',top);
+  $('s-time', new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'}));
+
+  var map = {};
+  list.forEach(function(s){ var g=s.grade||'Unknown'; if(!map[g])map[g]={pts:0,n:0}; map[g].pts+=s.points; map[g].n++; });
+  var gs = Object.entries(map).sort(function(a,b){return b[1].pts-a[1].pts;});
+  var mx = gs.length ? gs[0][1].pts||1 : 1;
+  document.getElementById('grade-boards').innerHTML = gs.length ? gs.map(function(e,i){
+    var g=e[0],d=e[1];
+    return '<div class="grade-card '+(i===0?'top':'')+'">'+
+      '<div class="gc-label">Grade Level</div>'+
+      '<div class="gc-name">'+esc(g)+'</div>'+
+      '<div class="gc-pts">'+d.pts+' <small>pts</small></div>'+
+      '<div class="gc-sub">'+d.n+' participant'+(d.n!==1?'s':'')+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(d.pts/mx*100)+'%"></div></div>'+
+    '</div>';
+  }).join('') : '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--stone);font-style:italic">No data yet.</div>';
+
+  var sorted = Object.entries(students).sort(function(a,b){return b[1].points-a[1].points;});
+  if (!sorted.length) { document.getElementById('lb-body').innerHTML='<tr class="msg-row"><td colspan="4">No valid scans yet — be the first to scan! 🌱</td></tr>'; return; }
+  var cls=function(i){return i===0?'r1':i===1?'r2':i===2?'r3':'rN';};
+  document.getElementById('lb-body').innerHTML = sorted.map(function(e,i){
+    var id=e[0],s=e[1];
+    return '<tr class="lb-row '+cls(i)+'">'+
+      '<td><div class="rank-badge">'+(i+1)+'</div></td>'+
+      '<td><div class="s-name">'+esc(s.name)+'</div><div class="s-id">'+esc(id)+'</div></td>'+
+      '<td><span class="grade-chip">'+esc(s.grade)+'</span></td>'+
+      '<td><div class="pts">'+s.points+' <span>pts</span></div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function checkPoints() {
+  var raw=document.getElementById('sid-input').value.trim();
+  if(!raw) return;
+  var card=document.getElementById('result-card');
+  var found=students[raw], fid=raw;
+  if(!found){ var lo=raw.toLowerCase(); Object.entries(students).forEach(function(e){if(e[0].toLowerCase()===lo){found=e[1];fid=e[0];}}); }
+  if(!found){
+    card.className='result-card show err';
+    $('r-name','Student not found');
+    $('r-meta','No records for "'+raw+'". Check your ID format, e.g. 01-2023-052');
+    document.getElementById('r-pts').className='r-pts err'; $('r-pts','?'); $('r-rank','–');
+    return;
+  }
+  var sorted=Object.values(students).sort(function(a,b){return b.points-a.points;});
+  var rank=sorted.indexOf(found)+1;
+  card.className='result-card show';
+  $('r-name',found.name); $('r-meta','Student ID: '+fid+' · Grade: '+found.grade);
+  document.getElementById('r-pts').className='r-pts'; $('r-pts',found.points); $('r-rank','#'+rank+' of '+sorted.length);
+}
+
+function showPage(page,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+page).classList.add('active'); btn.classList.add('active');
+}
+function $(id,val){ var el=document.getElementById(id); if(el) el.textContent=val; }
+function setStatus(t,m){ var el=document.getElementById('status-bar'); el.className='status-bar'+(t?' '+t:''); el.textContent=m; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
